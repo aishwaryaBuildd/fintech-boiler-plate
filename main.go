@@ -20,11 +20,14 @@ func main() {
 	}
 
 	// Connect to the database
-	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@/%s",
+	db, err := sql.Open("mysql", fmt.Sprintf("%s:%s@tcp(%s:%s)/%s",
 		os.Getenv("DB_USER"),
 		os.Getenv("DB_PASS"),
+		os.Getenv("DB_HOST"),
+		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"),
 	))
+
 	if err != nil {
 		log.Fatal("Failed to connect to database:", err)
 	}
