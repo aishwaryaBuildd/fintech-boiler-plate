@@ -5,6 +5,7 @@ package controller
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"math/rand"
 	"net/http"
 	"slices"
@@ -56,6 +57,7 @@ func Register(c *gin.Context, db *sql.DB) {
 	var exists int
 	err := db.QueryRow("SELECT COUNT(*) FROM users WHERE phone_number = ?", user.PhoneNumber).Scan(&exists)
 	if err != nil {
+		log.Printf("error is %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to check user existence"})
 		return
 	}
