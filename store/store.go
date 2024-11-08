@@ -22,4 +22,6 @@ type Store interface {
 	ListFolder(context context.Context) ([]models.Folder, error)
 	GetFolder(context context.Context, id string) (models.Folder, error)
 	DeleteFolder(context context.Context, id string) error
+
+	AddMessage(context context.Context, message models.Message) error
 }
