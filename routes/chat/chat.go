@@ -2,6 +2,7 @@ package chat
 
 import (
 	chatController "fintech/controllers/chat"
+	"fintech/middlewares"
 	"fintech/utils"
 	"net/http"
 
@@ -15,9 +16,9 @@ func ChatRoutes(r *gin.Engine, db store.Store) {
 
 	r.GET("/chat/ws", ChatAuthMiddleware, controller.Chat)
 	r.GET("/chat/ws/admin", ChatAdminMiddleware, controller.ChatAdmin)
-	r.GET("/chat/sessions", ChatAuthMiddleware, controller.GetChatSessions)
-	r.GET("/chat/sessions/:session_id/messages", ChatAuthMiddleware, controller.GetChatSessionsMessages)
-	r.GET("/chat/sessions/:session_id/messages/read", ChatAuthMiddleware, controller.MarkChatSessionsAsRead)
+	r.GET("/chat/sessions", middlewares.AuthMiddleware, controller.GetChatSessions)
+	r.GET("/chat/sessions/:session_id/messages", middlewares.AuthMiddleware, controller.GetChatSessionsMessages)
+	r.GET("/chat/sessions/:session_id/messages/read", middlewares.AuthMiddleware, controller.MarkChatSessionsAsRead)
 }
 
 func ChatAuthMiddleware(c *gin.Context) {

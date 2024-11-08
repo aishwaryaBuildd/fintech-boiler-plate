@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Go WebSocket Chat</title>
+</head>
+<body>
+    <h1>WebSocket Chat Admin</h1>
+    <input id="messageInput" type="text" placeholder="Enter your message">
+    <button onclick="sendMessage()">Send</button>
+    <ul id="messages"></ul>
+
+    <script>
+        const socket = new WebSocket("ws://localhost:8080/chat/ws/admin?authorization=Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo1LCJwaG9uZV9udW1iZXIiOiI5ODQwMDkxMTMwIiwicm9sZSI6ImFkbWluIiwiZXhwIjoxNzMxMTUwMDk5fQ.dubw6XVFV-Q58V7XPqagEz2Zpugm6dr_3WwIAr4pkC0&receiver_id=6");
+
+        socket.onmessage = function(event) {
+            const messages = document.getElementById("messages");
+            const messageItem = document.createElement("li");
+            messageItem.textContent = event.data;
+            messages.appendChild(messageItem);
+        };
+
+        function sendMessage() {
+            const input = document.getElementById("messageInput");
+            socket.send(input.value);
+            input.value = "";
+        }
+    </script>
+</body>
+</html>

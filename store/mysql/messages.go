@@ -48,7 +48,14 @@ func (m *MySQLStore) GetChatSessions(context context.Context, userID int) ([]mod
 }
 
 func (m *MySQLStore) MarkChatSessionsAsRead(context context.Context, ChatSessionID int) error {
-	_, err := m.DB.NamedExecContext(context, "UPDATE chat_sessions SET unread_count = 0 WHERE id = ?",
+	_, err := m.DB.ExecContext(context, "UPDATE messages SET is_read = 1 WHERE session_id = ?",
+		ChatSessionID)
+
+	if err != nil {
+		return err
+	}
+
+	_, err = m.DB.ExecContext(context, "UPDATE chat_sessions SET unread_count = 0 WHERE id = ?",
 		ChatSessionID)
 	return err
 }
