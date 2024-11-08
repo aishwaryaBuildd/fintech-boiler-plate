@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"sync"
+	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gorilla/websocket"
@@ -131,13 +132,17 @@ func (controller ChatController) handleMessages(c *gin.Context, conn *Connection
 			SenderID:   conn.SenderID,
 			ReceiverID: conn.ReceiverID,
 			Content:    string(message),
+			CreatedAt:  time.Now(),
 		}
 		sessionID, err := controller.Store.GetOrCreateSession(c, m)
 		if err != nil {
 			fmt.Printf("User %d is not connected\n", conn.ReceiverID)
 		}
 		m.SessionID = sessionID
-		controller.Store.AddMessage(c, m)
+		err = controller.Store.AddMessage(c, m)
+		if err != nil {
+			fmt.Print("message not stored \n", m)
+		}
 		fmt.Printf("Message from User %d to User %d: %s\n", conn.SenderID, conn.ReceiverID, message)
 
 		// Relay the message to the receiver if they're connected

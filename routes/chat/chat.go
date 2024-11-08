@@ -20,7 +20,7 @@ func ChatRoutes(r *gin.Engine, db store.Store) {
 }
 
 func ChatAuthMiddleware(c *gin.Context) {
-	token := c.Query("Authorization")
+	token := c.Query("authorization")
 	if token == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
 		c.Abort()

@@ -3,6 +3,7 @@ package main
 import (
 	"fintech/pkg/vdo"
 	"fintech/routes/auth"
+	"fintech/routes/chat"
 	"fintech/routes/courses"
 	"fintech/routes/folders"
 	"fintech/store/mysql"
@@ -59,6 +60,8 @@ func main() {
 	auth.AuthRoutes(r, mysqlStore)
 	courses.CourseRoutes(r, mysqlStore, vdo)
 	folders.FolderRoutes(r, mysqlStore, vdo)
+	chat.ChatRoutes(r, mysqlStore)
+
 	// routes.VideoRoutes(r, db)
 	// routes.UserActionRoutes(r, db)
 

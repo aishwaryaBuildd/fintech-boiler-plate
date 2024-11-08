@@ -38,8 +38,9 @@ CREATE TABLE chat_sessions (
     receiver_id INT REFERENCES users(id) ON DELETE CASCADE,
     last_message TEXT,
     unread_count INT DEFAULT 0,
-    status VARCHAR(10) DEFAULT 'open', -- 'open' or 'closed'
+    status VARCHAR(10) DEFAULT 'open',
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        UNIQUE (sender_id, receiver_id)  -- Ensure each pair of users has only one session
 );
 
 CREATE TABLE messages (

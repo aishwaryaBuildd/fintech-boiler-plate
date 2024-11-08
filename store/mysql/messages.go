@@ -6,7 +6,7 @@ import (
 )
 
 func (m *MySQLStore) AddMessage(context context.Context, c models.Message) error {
-	_, err := m.DB.NamedExecContext(context, "INSERT INTO messages (id, sender_id, receiver_id, content, created_at) VALUES (:id, :sender_id, :receiver_id, :content, :created_at)",
+	_, err := m.DB.NamedExecContext(context, "INSERT INTO messages (id, sender_id, receiver_id, content, session_id,created_at) VALUES (:id, :sender_id, :receiver_id, :content, :session_id, :created_at)",
 		c)
 
 	return err
@@ -14,17 +14,25 @@ func (m *MySQLStore) AddMessage(context context.Context, c models.Message) error
 
 func (m *MySQLStore) GetOrCreateSession(context context.Context, c models.Message) (int, error) {
 	var sessionID int
-	err := m.DB.QueryRowContext(context, `
-        INSERT INTO chat_sessions (sender_id, receiver_id, last_message, unread_count)
-        VALUES ($1, $2, $3, 1)
-        ON CONFLICT (sender_id, receiver_id) 
-        DO UPDATE SET last_message = $3, unread_count = chat_sessions.unread_count + 1, updated_at = NOW()
-        RETURNING id`,
-		c.SenderID, c.ReceiverID, c.Content).Scan(&sessionID)
+	query := `
+        INSERT INTO chat_sessions (sender_id, receiver_id, last_message, unread_count, updated_at)
+        VALUES (?, ?, ?, 1, NOW())
+        ON DUPLICATE KEY UPDATE 
+            last_message = VALUES(last_message), 
+            unread_count = chat_sessions.unread_count + 1, 
+            updated_at = NOW()`
 
+	result, err := m.DB.ExecContext(context, query, c.SenderID, c.ReceiverID, c.Content)
 	if err != nil {
-		return sessionID, err
+		return 0, err
 	}
+
+	// Get the session ID
+	sessionID64, err := result.LastInsertId()
+	if err != nil {
+		return 0, err
+	}
+	sessionID = int(sessionID64)
 
 	return sessionID, nil
 }
