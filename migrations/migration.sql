@@ -34,15 +34,20 @@ CREATE TABLE `folders` (
 
 CREATE TABLE chat_sessions (
     id SERIAL PRIMARY KEY,
-    user1_id INT REFERENCES users(id),
-    user2_id INT REFERENCES users(id),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    sender_id INT REFERENCES users(id) ON DELETE CASCADE,
+    receiver_id INT REFERENCES users(id) ON DELETE CASCADE,
+    last_message TEXT,
+    unread_count INT DEFAULT 0,
+    status VARCHAR(10) DEFAULT 'open', -- 'open' or 'closed'
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE messages (
     id SERIAL PRIMARY KEY,
-    sender_id INT REFERENCES users(id),
-    receiver_id INT REFERENCES users(id),
+    session_id INT REFERENCES chat_sessions(id) ON DELETE CASCADE,
+    sender_id INT REFERENCES users(id) ON DELETE CASCADE,
+    receiver_id INT REFERENCES users(id) ON DELETE CASCADE,
     content TEXT NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

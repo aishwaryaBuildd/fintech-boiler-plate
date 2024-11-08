@@ -3,9 +3,11 @@ package models
 import "time"
 
 type Message struct {
-	ID         int       `db:"id"`          // SERIAL primary key
-	SenderID   int       `db:"sender_id"`   // INT, foreign key referencing users(id)
-	ReceiverID int       `db:"receiver_id"` // INT, foreign key referencing users(id)
-	Content    string    `db:"content"`     // TEXT, non-nullable message content
-	CreatedAt  time.Time `db:"created_at"`  // TIMESTAMP with default current timestamp
+	ID         int       `json:"id" db:"id"`
+	SessionID  int       `json:"session_id" db:"session_id"`
+	SenderID   int       `json:"sender_id" db:"sender_id"`
+	ReceiverID int       `json:"receiver_id" db:"receiver_id"`
+	Content    string    `json:"content" db:"content"`
+	IsRead     bool      `json:"is_read" db:"is_read"`
+	CreatedAt  time.Time `json:"created_at" db:"created_at"`
 }

@@ -23,5 +23,9 @@ type Store interface {
 	GetFolder(context context.Context, id string) (models.Folder, error)
 	DeleteFolder(context context.Context, id string) error
 
+	GetOrCreateSession(context context.Context, message models.Message) (int, error)
 	AddMessage(context context.Context, message models.Message) error
+	GetChatSessions(context context.Context, userID int) ([]models.ChatSession, error)
+	GetChatSessionsMessages(context context.Context, sessionID int) ([]models.Message, error)
+	MarkChatSessionsAsRead(context context.Context, ChatSessionID int) error
 }

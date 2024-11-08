@@ -5,6 +5,7 @@ import (
 	"fintech/store/models"
 	"fmt"
 	"net/http"
+	"strconv"
 	"sync"
 
 	"github.com/gin-gonic/gin"
@@ -71,6 +72,44 @@ func (controller ChatController) Chat(c *gin.Context) {
 	go controller.handleMessages(c, conn)
 }
 
+func (controller ChatController) GetChatSessions(c *gin.Context) {
+	userID := c.MustGet("user_id").(int)
+
+	sessions, err := controller.Store.GetChatSessions(c, userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, sessions)
+}
+
+func (controller ChatController) GetChatSessionsMessages(c *gin.Context) {
+	sessionID := c.Param("session_id")
+	sID, _ := strconv.Atoi(sessionID)
+
+	messages, err := controller.Store.GetChatSessionsMessages(c, sID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	c.JSON(http.StatusOK, messages)
+}
+
+func (controller ChatController) MarkChatSessionsAsRead(c *gin.Context) {
+	sessionID := c.Param("session_id")
+	sID, _ := strconv.Atoi(sessionID)
+
+	err := controller.Store.MarkChatSessionsAsRead(c, sID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	c.Status(http.StatusNoContent)
+}
+
 func (controller ChatController) handleMessages(c *gin.Context, conn *Connection) {
 	defer func() {
 		conn.Conn.Close()
@@ -87,11 +126,18 @@ func (controller ChatController) handleMessages(c *gin.Context, conn *Connection
 			break
 		}
 
-		controller.Store.AddMessage(c, models.Message{
+		// Check and create sessions if needed
+		m := models.Message{
 			SenderID:   conn.SenderID,
 			ReceiverID: conn.ReceiverID,
 			Content:    string(message),
-		})
+		}
+		sessionID, err := controller.Store.GetOrCreateSession(c, m)
+		if err != nil {
+			fmt.Printf("User %d is not connected\n", conn.ReceiverID)
+		}
+		m.SessionID = sessionID
+		controller.Store.AddMessage(c, m)
 		fmt.Printf("Message from User %d to User %d: %s\n", conn.SenderID, conn.ReceiverID, message)
 
 		// Relay the message to the receiver if they're connected
