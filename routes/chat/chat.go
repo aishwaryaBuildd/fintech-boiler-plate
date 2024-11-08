@@ -14,6 +14,7 @@ func ChatRoutes(r *gin.Engine, db store.Store) {
 	controller := chatController.ChatController{Store: db}
 
 	r.GET("/chat/ws", ChatAuthMiddleware, controller.Chat)
+	r.GET("/chat/ws/admin", ChatAdminMiddleware, controller.ChatAdmin)
 	r.GET("/chat/sessions", ChatAuthMiddleware, controller.GetChatSessions)
 	r.GET("/chat/sessions/:session_id/messages", ChatAuthMiddleware, controller.GetChatSessionsMessages)
 	r.GET("/chat/sessions/:session_id/messages/read", ChatAuthMiddleware, controller.MarkChatSessionsAsRead)
@@ -34,6 +35,31 @@ func ChatAuthMiddleware(c *gin.Context) {
 		return
 	}
 
+	c.Set("user_id", claims.UserID)           // Store phone number in context
+	c.Set("phone_number", claims.PhoneNumber) // Store phone number in context
+	c.Next()
+}
+
+// AdminMiddleware checks if the user is an admin
+func ChatAdminMiddleware(c *gin.Context) {
+	token := c.Query("authorization")
+	if token == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Authorization header required"})
+		c.Abort()
+		return
+	}
+
+	claims, err := utils.VerifyJWT(token) // We only care about phone number here
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid token"})
+		c.Abort()
+		return
+	}
+	if claims.Role != "admin" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Invalid access"})
+		c.Abort()
+		return
+	}
 	c.Set("user_id", claims.UserID)           // Store phone number in context
 	c.Set("phone_number", claims.PhoneNumber) // Store phone number in context
 	c.Next()

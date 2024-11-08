@@ -73,6 +73,35 @@ func (controller ChatController) Chat(c *gin.Context) {
 	go controller.handleMessages(c, conn)
 }
 
+func (controller ChatController) ChatAdmin(c *gin.Context) {
+	senderID := c.MustGet("user_id").(int)
+	receiverIDString := c.Query("receiver_id")
+	receiverID, _ := strconv.Atoi(receiverIDString)
+
+	// Upgrade the connection to WebSocket
+	ws, err := upgrader.Upgrade(c.Writer, c.Request, nil)
+	if err != nil {
+		fmt.Println("Failed to upgrade to WebSocket:", err)
+		return
+	}
+
+	conn := &Connection{
+		Conn:       ws,
+		SenderID:   senderID,
+		ReceiverID: receiverID,
+	}
+	key := fmt.Sprintf("%d:%d", senderID, receiverID)
+
+	mutex.Lock()
+	connections[key] = conn
+	mutex.Unlock()
+
+	fmt.Printf("New WebSocket connection: User %d to User %d\n", senderID, receiverID)
+
+	// Listen for incoming messages
+	go controller.handleMessages(c, conn)
+}
+
 func (controller ChatController) GetChatSessions(c *gin.Context) {
 	userID := c.MustGet("user_id").(int)
 
