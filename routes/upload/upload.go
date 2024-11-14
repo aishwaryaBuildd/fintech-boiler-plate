@@ -9,7 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func UploadRoutes(r *gin.Engine, db store.Store, storageClient gcp.GCPUploader, vdo vdo.VideoCipherClient) {
+func UploadRoutes(r *gin.Engine, db store.Store, storageClient gcp.GCPUploader, vdo *vdo.VideoCipherClient) {
 	controller := upload.Controller{Store: db, StorageClient: storageClient, VDO: vdo}
 
 	r.POST("/upload/gcp/files", controller.UploadGCP)

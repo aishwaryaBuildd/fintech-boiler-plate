@@ -14,7 +14,7 @@ import (
 type Controller struct {
 	Store         store.Store
 	StorageClient CloudUploader
-	VDO           vdo.VideoCipherClient
+	VDO           *vdo.VideoCipherClient
 }
 
 func (controller *Controller) UploadGCP(c *gin.Context) {
