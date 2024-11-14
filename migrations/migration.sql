@@ -28,12 +28,11 @@ CREATE TABLE `courses` (
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 
-CREATE TABLE `folders` (
+CREATE TABLE `sections` (
   `id` CHAR(36) NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` varchar(300) DEFAULT NULL,
   `course_id` CHAR(36) NOT NULL,
-  `folder_id` varchar(200) NOT NULL,
   `created_at` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
   `updated_at` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`)

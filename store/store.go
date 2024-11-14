@@ -17,11 +17,11 @@ type Store interface {
 	GetCourse(context context.Context, id string) (models.Course, error)
 	DeleteCourse(context context.Context, id string) error
 
-	CreateFolder(context context.Context, folder models.Folder) error
-	UpdateFolder(context context.Context, folder models.Folder) error
-	ListFolder(context context.Context) ([]models.Folder, error)
-	GetFolder(context context.Context, id string) (models.Folder, error)
-	DeleteFolder(context context.Context, id string) error
+	CreateSection(context context.Context, section models.Section) error
+	UpdateSection(context context.Context, section models.Section) error
+	ListSection(context context.Context) ([]models.Section, error)
+	GetSection(context context.Context, id string) (models.Section, error)
+	DeleteSection(context context.Context, id string) error
 
 	GetOrCreateSession(context context.Context, message models.Message) (int, error)
 	AddMessage(context context.Context, message models.Message) error
