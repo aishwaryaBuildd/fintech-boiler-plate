@@ -1,11 +1,13 @@
 package main
 
 import (
+	"fintech/pkg/gcp"
 	"fintech/pkg/vdo"
 	"fintech/routes/auth"
 	"fintech/routes/chat"
 	"fintech/routes/courses"
 	"fintech/routes/folders"
+	"fintech/routes/upload"
 	"fintech/store/mysql"
 	"fmt"
 	"log"
@@ -55,12 +57,14 @@ func main() {
 	mysqlStore := mysql.NewMySQLStore(db)
 
 	vdo := vdo.NewVideoCipherClient()
+	gcpStorage := gcp.NewGCPUploader("bucketName", "credsFile")
 
 	// Set up routes
 	auth.AuthRoutes(r, mysqlStore)
 	courses.CourseRoutes(r, mysqlStore, vdo)
 	folders.FolderRoutes(r, mysqlStore, vdo)
 	chat.ChatRoutes(r, mysqlStore)
+	upload.UploadRoutes(r, mysqlStore, gcpStorage, vdo)
 
 	// routes.VideoRoutes(r, db)
 	// routes.UserActionRoutes(r, db)
