@@ -86,7 +86,52 @@ func (controller *Controller) ViewVDO(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"url": otpResponse.PlayURL})
+}
 
+func (controller *Controller) VDOCaption(c *gin.Context) {
+	videoID := c.Param("id")
+	var req captionRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	err := controller.VDO.SetVideoSubtitle(videoID, req.URL, req.Lang, req.Format)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+func (controller *Controller) VDOThumbnail(c *gin.Context) {
+	videoID := c.Param("id")
+	var req thumnailRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid input"})
+		return
+	}
+
+	err := controller.VDO.SetVideoThumbnail(videoID, req.URL)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		return
+	}
+
+	c.Status(http.StatusOK)
+}
+
+type thumnailRequest struct {
+	// TODO: do the json tag
+	URL string `json:"url"`
+}
+
+type captionRequest struct {
+	// TODO: do the json tag
+	URL    string `json:"url"`
+	Lang   string `json:"lang"`
+	Format string `json:"format"`
 }
 
 type CloudUploader interface {

@@ -15,4 +15,6 @@ func UploadRoutes(r *gin.Engine, db store.Store, storageClient gcp.GCPUploader, 
 	r.POST("/upload/gcp/files", controller.UploadGCP)
 	r.POST("/upload/vdo", controller.UploadVDO)
 	r.POST("/view/vdo/:id", controller.ViewVDO)
+	r.POST("/upload/vdo/:id/thumbnail", controller.VDOThumbnail)
+	r.POST("/upload/vdo/:id/caption", controller.VDOCaption)
 }

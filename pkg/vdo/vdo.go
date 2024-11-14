@@ -485,6 +485,74 @@ func (v *VideoCipherClient) GenerateVideoOTP(videoID string) (OTPResponse, error
 	return otpResponse, nil
 }
 
+func (v *VideoCipherClient) SetVideoSubtitle(videoID, subtitleURL, lang, format string) error {
+	url := fmt.Sprintf("https://dev.vdocipher.com/api/videos/%s/subtitles", videoID)
+
+	reqBody, err := json.Marshal(SubtitleRequest{
+		Lang:   lang,
+		URL:    subtitleURL,
+		Format: format,
+	})
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Apisecret "+v.secret)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to set subtitles, status: %v", resp.Status)
+	}
+
+	return nil
+}
+
+type ThumbnailRequest struct {
+	URL string `json:"url"`
+}
+
+func (v *VideoCipherClient) SetVideoThumbnail(videoID, thumbnailURL string) error {
+	url := fmt.Sprintf("https://dev.vdocipher.com/api/videos/%s/poster", videoID)
+
+	reqBody, err := json.Marshal(ThumbnailRequest{URL: thumbnailURL})
+	if err != nil {
+		return err
+	}
+
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return err
+	}
+
+	req.Header.Set("Authorization", "Apisecret "+v.secret)
+	req.Header.Set("Content-Type", "application/json")
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return fmt.Errorf("failed to set thumbnail, status: %v", resp.Status)
+	}
+
+	return nil
+}
+
 type OTPRequest struct {
 	VideoID string `json:"videoId"`
 }
@@ -492,4 +560,10 @@ type OTPRequest struct {
 type OTPResponse struct {
 	OTP     string `json:"otp"`
 	PlayURL string `json:"playbackInfo"`
+}
+
+type SubtitleRequest struct {
+	Lang   string `json:"lang"`
+	URL    string `json:"url"`
+	Format string `json:"format"`
 }
