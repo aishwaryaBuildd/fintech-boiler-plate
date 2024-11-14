@@ -10,6 +10,7 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"time"
 )
 
 type VideoCipherClient struct {
@@ -443,4 +444,52 @@ func (v *VideoCipherClient) GetSubFolders(folderID string) (*FolderResponse, err
 
 	// Return the fetched folder data
 	return &folderResponse, nil
+}
+
+func (v *VideoCipherClient) GenerateVideoOTP(videoID string) (OTPResponse, error) {
+	url := "https://dev.vdocipher.com/api/videos/" + videoID + "/otp"
+
+	// Prepare the request
+	reqBody, err := json.Marshal(OTPRequest{VideoID: videoID})
+	if err != nil {
+		return OTPResponse{}, err
+	}
+	req, err := http.NewRequest("POST", url, bytes.NewBuffer(reqBody))
+	if err != nil {
+		return OTPResponse{}, err
+	}
+
+	// Set headers
+	req.Header.Set("Authorization", "Apisecret "+v.secret)
+	req.Header.Set("Content-Type", "application/json")
+
+	// Send the request
+	client := &http.Client{Timeout: 10 * time.Second}
+	resp, err := client.Do(req)
+	if err != nil {
+		return OTPResponse{}, err
+	}
+	defer resp.Body.Close()
+
+	// Parse the response
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return OTPResponse{}, err
+	}
+
+	var otpResponse OTPResponse
+	if err := json.Unmarshal(body, &otpResponse); err != nil {
+		return OTPResponse{}, err
+	}
+
+	return otpResponse, nil
+}
+
+type OTPRequest struct {
+	VideoID string `json:"videoId"`
+}
+
+type OTPResponse struct {
+	OTP     string `json:"otp"`
+	PlayURL string `json:"playbackInfo"`
 }

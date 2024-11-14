@@ -14,12 +14,19 @@ CREATE TABLE `courses` (
   `id` CHAR(36) NOT NULL,
   `name` varchar(50) NOT NULL,
   `description` varchar(300) DEFAULT NULL,
+  `level`  varchar(50) NOT NULL,
+  `category`  varchar(100) NOT NULL,
+  `topic`  varchar(100) NOT NULL,
+  `duration`  varchar(50) NOT NULL,
   `author_id` int NOT NULL,
   `folder_id` varchar(200) NOT NULL,
+  `thumbnail` varchar(300) NOT NULL,
+  `trailer` varchar(300) NULL,
   `created_at` datetime(6) DEFAULT CURRENT_TIMESTAMP(6),
   `updated_at` datetime(6) DEFAULT CURRENT_TIMESTAMP(6) ON UPDATE CURRENT_TIMESTAMP(6),
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=5 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
 
 CREATE TABLE `folders` (
   `id` CHAR(36) NOT NULL,

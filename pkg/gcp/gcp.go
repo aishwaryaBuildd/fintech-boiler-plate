@@ -31,7 +31,7 @@ func NewGCPUploader(bucket, credsFile string) GCPUploader {
 	}
 }
 
-func (g *GCPUploader) UploadImage(ctx context.Context, file multipart.File, header *multipart.FileHeader) (string, error) {
+func (g GCPUploader) UploadFile(ctx context.Context, file multipart.File, header *multipart.FileHeader) (string, error) {
 	// Define your bucket name and object (file) name
 	objectName := fmt.Sprintf("uploads/%d_%s", time.Now().Unix(), header.Filename)
 
