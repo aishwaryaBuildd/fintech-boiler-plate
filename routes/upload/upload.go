@@ -13,6 +13,7 @@ func UploadRoutes(r *gin.Engine, db store.Store, storageClient gcp.GCPUploader, 
 	controller := upload.Controller{Store: db, StorageClient: storageClient, VDO: vdo}
 
 	r.POST("/upload/gcp/files", controller.UploadGCP)
+	// will not use this endpoint
 	r.POST("/upload/vdo", controller.UploadVDO)
 	r.POST("/view/vdo/:id", controller.ViewVDO)
 	r.POST("/upload/vdo/:id/thumbnail", controller.VDOThumbnail)

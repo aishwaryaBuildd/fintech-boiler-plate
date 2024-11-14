@@ -44,7 +44,7 @@ func sectionMiddleware(db store.Store) gin.HandlerFunc {
 			return
 		}
 
-		c.Set("folder", folder)
+		c.Set("section", folder)
 	}
 
 }

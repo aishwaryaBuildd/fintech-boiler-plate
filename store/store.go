@@ -23,6 +23,12 @@ type Store interface {
 	GetSection(context context.Context, id string) (models.Section, error)
 	DeleteSection(context context.Context, id string) error
 
+	CreateLecture(context context.Context, lecture models.Lecture) error
+	UpdateLecture(context context.Context, lecture models.Lecture) error
+	ListLecture(context context.Context) ([]models.Lecture, error)
+	GetLecture(context context.Context, id string) (models.Lecture, error)
+	DeleteLecture(context context.Context, id string) error
+
 	GetOrCreateSession(context context.Context, message models.Message) (int, error)
 	AddMessage(context context.Context, message models.Message) error
 	GetChatSessions(context context.Context, userID int) ([]models.ChatSession, error)

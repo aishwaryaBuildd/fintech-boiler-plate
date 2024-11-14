@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/gin-gonic/gin"
+	"github.com/go-sql-driver/mysql"
 	"github.com/google/uuid"
 )
 
@@ -36,6 +37,17 @@ func (controller Controller) Create(c *gin.Context) {
 		UpdatedAt:   time.Now(),
 	}
 
+	err := controller.Store.CreateSection(c, section)
+	if err != nil {
+		if mysqlErr, ok := err.(*mysql.MySQLError); ok && mysqlErr.Number == 1062 {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Section ID already exists"})
+			return
+		} else {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			return
+		}
+	}
+
 	c.JSON(http.StatusCreated, section)
 }
 
@@ -51,6 +63,7 @@ func (controller Controller) Update(c *gin.Context) {
 
 	section.Description = req.Description
 	section.Name = req.Name
+	section.UpdatedAt = time.Now()
 	err := controller.Store.UpdateSection(c, section)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err})
